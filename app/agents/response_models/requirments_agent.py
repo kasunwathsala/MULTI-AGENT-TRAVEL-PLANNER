@@ -34,6 +34,22 @@ class Preferences(BaseModel):
     date_flex_days: int = Field(..., description="Date flexibility in days")
     interests: List[str] = Field(..., description="List of travel interests")
 
+class Budget(BaseModel):
+    """Budget information."""
+
+    total_currency: str = Field(..., description="Currency code (e.g., USD)")
+    total_amount: float = Field(..., description="Total budget amount")
+    flights_amount: float = Field(..., description="Budget allocated for flights")
+    hotels_amount: float = Field(..., description="Budget allocated for hotels")
+
+class HotelPreferences(BaseModel):
+    """Hotel preferences."""
+
+    stars: str = Field(..., description="Star rating range (e.g., 3-4)")
+    area: str = Field(..., description="Area preference (e.g., central, quiet)")
+    room_type: str = Field(..., description="Room type preference")
+
+
 class Requirements(BaseModel):
     traveler: TravelerProfile    
 
