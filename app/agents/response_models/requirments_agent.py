@@ -49,6 +49,47 @@ class HotelPreferences(BaseModel):
     area: str = Field(..., description="Area preference (e.g., central, quiet)")
     room_type: str = Field(..., description="Room type preference")
 
+class FlightQuery(BaseModel):
+    """Flight search query parameters."""
+
+    from_iata: str = Field(..., description="Origin airport IATA code")
+    to_iata: str = Field(..., description="Destination airport IATA code")
+    date: str = Field(..., description="Flight date in YYYY-MM-DD format")
+    passengers: int = Field(..., description="Number of passengers")
+    cabin: str = Field(..., description="Cabin class")
+    non_stop: bool = Field(..., description="Non-stop preference")
+
+class FlightOption(BaseModel):
+    """Individual flight option details."""
+
+    carrier: str = Field(..., description="Airline carrier")
+    flight_number: str = Field(..., description="Flight number")
+    depart_iso: str = Field(..., description="Departure time in ISO format")
+    arrive_iso: str = Field(..., description="Arrival time in ISO format")
+    price_usd: float = Field(..., description="Price in USD")
+
+class FlightResult(BaseModel):
+    """Flight search result."""
+
+    available: bool = Field(..., description="Whether flights are available")
+    top_option: Optional[FlightOption] = Field(
+        None, description="Best flight option if available"
+    )
+
+class FlightCheck(BaseModel):
+    """Flight availability check results."""
+
+    outbound_query: FlightQuery = Field(..., description="Outbound flight search query")
+    outbound_result: FlightResult = Field(
+        ..., description="Outbound flight search result"
+    )
+    return_query: Optional[FlightQuery] = Field(
+        None, description="Return flight search query (for round trips)"
+    )
+    return_result: Optional[FlightResult] = Field(
+        None, description="Return flight search result (for round trips)"
+    )        
+
 
 class Requirements(BaseModel):
     traveler: TravelerProfile    
