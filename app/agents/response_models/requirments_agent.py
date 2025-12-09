@@ -91,9 +91,44 @@ class FlightCheck(BaseModel):
     )        
 
 
-class Requirements(BaseModel):
-    traveler: TravelerProfile    
+class UserConfirmations(BaseModel):
+    """User confirmation status."""
+
+    accept_outbound_top_option: bool = Field(
+        ..., description="Whether user accepts the top outbound option"
+    )
+    notes: Optional[str] = Field(None, description="Additional user notes")
+
+
+class MissingInfo(BaseModel):
+    """Missing information."""
+
+    missing_info: List[str] = Field(
+        ..., description="List of missing or ambiguous fields"
+    )
+    question: str = Field(
+        ..., description="Question to ask the user to provide the missing information"
+    )
+
+class CompleteRequirements(BaseModel):
+    """
+    The final output from the requirements agent when it has gathered all the information from the user and necessary tools calls.
+    """
+
+    traveler: TravelerProfile = Field(..., description="Traveler profile information")
+    trip: TripDetails = Field(..., description="Trip basic information")
+    preferences: Preferences = Field(..., description="User travel preferences")
+    budget: Budget = Field(..., description="Budget information")
+    hotel_prefs: HotelPreferences = Field(..., description="Hotel preferences")
+    flight_check: FlightCheck = Field(
+        ..., description="Flight availability check results"
+    )
+    user_confirmations: UserConfirmations = Field(
+        ..., description="User confirmation status"
+    )
+    missing_info: MissingInfo = Field(..., description="Missing information")
+
 
 class RequirementsAgentResponseModel(BaseModel):
-    requirements: Requirements
+    requirements: CompleteRequirements = Field(..., description="Complete requirements")
    
