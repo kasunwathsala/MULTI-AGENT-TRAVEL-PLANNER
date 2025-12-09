@@ -25,6 +25,15 @@ class TripDetails(BaseModel):
         None, description="Return date in YYYY-MM-DD format (for round trips)"
     )    
 
+class Preferences(BaseModel):
+    """User travel preferences."""
+
+    cabin_class: str = Field(..., description="Cabin class: economy, premium, business")
+    non_stop: bool = Field(..., description="Preference for non-stop flights")
+    max_layovers: int = Field(..., description="Maximum number of layovers allowed")
+    date_flex_days: int = Field(..., description="Date flexibility in days")
+    interests: List[str] = Field(..., description="List of travel interests")
+
 class Requirements(BaseModel):
     traveler: TravelerProfile    
 
