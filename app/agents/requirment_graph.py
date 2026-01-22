@@ -82,7 +82,7 @@ if __name__ == "__main__":
         ]
     )
 
-    config = {"configurable": {"thread_id": "thread-1"}}
+    config = {"configurable":  {"thread_id": "thread-1"}}
 
     result = requirements_graph.invoke(initial_state, config)
 
