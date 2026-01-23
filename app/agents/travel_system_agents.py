@@ -1,10 +1,14 @@
 from langchain.agents import create_agent
 
 
-from app.agents.promopts import REQUIREMENTS_AGENT_SYSTEM_PROMPT
-from app.agents.response_models import RequirementsAgentResponseModel
-from app.agents.tools import search_flight_availability
-from app.core.llm import model
+from app.agents.prompts import REQUIREMENTS_AGENT_SYSTEM_PROMPT, PLANNER_AGENT_SYSTEM_PROMPT, BOOKER_AGENT_SYSTEM_PROMPT
+from app.agents.response_models import RequirementsAgentResponseModel, PlannerAgentResponseModel, BookerAgentResponseModel
+from app.agents.tools.flight_tools import search_flight_availability
+from app.agents.tools.planner_tools import web_search
+from app.agents.tools.booker_tools import book_flight, book_hotel, search_hotels
+from langchain_core.agents.response_models import ToolStrategy
+
+from app.core.llm import llm 
 
 
 
