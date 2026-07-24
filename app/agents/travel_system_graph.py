@@ -1,5 +1,5 @@
 import json
-from typing import Optional
+from typing import Optional, cast
 
 from langchain.messages import HumanMessage, AIMessage
 from langgraph.graph import StateGraph, MessagesState, START, END
@@ -7,9 +7,9 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
 from langchain_core.runnables import RunnableConfig
 
-from app.agents.requirements_graph import requirements_graph
+from app.agents.requirment_graph import requirements_graph
 from app.agents.travel_system_agents import planner_agent, booker_agent
-from app.agents.requirements_graph import RequirementsGraphState
+from app.agents.requirment_graph import RequirementsGraphState
 
 
 checkpointer = InMemorySaver()
@@ -83,75 +83,72 @@ def requirements_subgraph_node(
     requirements = subgraph_result.get("requirements")
 
     # The result contains 'requirements' field populated when complete
-    return {
+    return cast(TravelSystemState, {
         "messages": [AIMessage(content=json.dumps(requirements), name="requirements")],
         "requirements": requirements,
-        "itinerary": None,
-        "bookings": None,
-    }
+    })
 
 def planner_agent_node(state: TravelSystemState) -> TravelSystemState:
     """
     Invoke planner agent to create itinerary based on requirements.
     """
-    requirements = state.get("requirements")
+    # requirements = state.get("requirements")
 
-    # Format requirements into context message for planner
-    requirements_str = json.dumps(requirements, indent=2)
-    planner_prompt = f"""Based on the following travel requirements, create a day-by-day itinerary:
+#     # Format requirements into context message for planner
+#     requirements_str = json.dumps(requirements, indent=2)
+#     planner_prompt = f"""Based on the following travel requirements, create a day-by-day itinerary:
     
-{requirements_str}"""
+# {requirements_str}"""
+
+    # response = planner_agent.invoke({"messages": HumanMessage(content=planner_prompt)})
 
     # Invoke planner agent
     response = planner_agent.invoke(
-        {"messages": [HumanMessage(content=planner_prompt)]}
+        {"messages": state["messages"]}
     )
 
     itinerary = response["structured_response"].itinerary.model_dump()
 
-    return {
+    return cast(TravelSystemState, {
         "messages": [AIMessage(content=json.dumps(itinerary), name="planner")],
-        "requirements": requirements,
         "itinerary": itinerary,
-        "bookings": None,
-    }
+    })
 
 
 def booker_agent_node(state: TravelSystemState) -> TravelSystemState:
     """
     Invoke booker agent to book flights and hotels based on requirements and itinerary.
     """
-    requirements = state.get("requirements")
-    itinerary = state.get("itinerary")
+#     requirements = state.get("requirements")
+#     itinerary = state.get("itinerary")
 
-    # Format booking context
-    requirements_str = json.dumps(requirements, indent=2)
-    itinerary_str = json.dumps(itinerary, indent=2)
+#     # Format booking context
+#     requirements_str = json.dumps(requirements, indent=2)
+#     itinerary_str = json.dumps(itinerary, indent=2)
 
-    booker_prompt = f"""Based on the following requirements and itinerary, book the flights and hotels:
+#     booker_prompt = f"""Based on the following requirements and itinerary, book the flights and hotels:
 
-REQUIREMENTS:
-{requirements_str}
+# REQUIREMENTS:
+# {requirements_str}
 
-ITINERARY:
-{itinerary_str}
+# ITINERARY:
+# {itinerary_str}
 
-Extract the flight ID from the confirmed flight in requirements and book it.
-For hotels, use the destination city and dates from the itinerary or requirements to book a hotel.
-Return booking confirmations for both flight and hotel."""
+# Extract the flight ID from the confirmed flight in requirements and book it.
+# For hotels, use the destination city and dates from the itinerary or requirements to book a hotel.
+# Return booking confirmations for both flight and hotel."""
 
     # Invoke booker agent
-    response = booker_agent.invoke({"messages": [HumanMessage(content=booker_prompt)]})
+    # response = booker_agent.invoke({"messages": [HumanMessage(content=booker_prompt)]})
+    response = booker_agent.invoke({"messages": state["messages"]})
 
     # Extract structured bookings from response
     bookings = response["structured_response"].bookings.model_dump()
 
-    return {
+    return cast(TravelSystemState, {
         "messages": [AIMessage(content=json.dumps(bookings), name="booker")],
-        "requirements": requirements,
-        "itinerary": itinerary,
         "bookings": bookings,
-    }
+    })
 
 
 # Build the graph
