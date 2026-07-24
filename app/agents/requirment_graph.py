@@ -6,12 +6,8 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.types import interrupt, Command
 from langgraph.checkpoint.memory import InMemorySaver
 
-# from app.agents.travel_system_agents import requirements_agent
-
-
 checkpointer = InMemorySaver()
-
-from app.agents import requirements_agent
+from app.agents.travel_system_agents import requirments_agent as requirements_agent
 
 class RequirementsGraphState(MessagesState):
     requirements_complete: bool

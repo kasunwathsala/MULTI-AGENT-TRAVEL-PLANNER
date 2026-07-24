@@ -6,7 +6,7 @@ from app.agents.response_models import RequirementsAgentResponseModel, PlannerAg
 from app.agents.tools.flight_tools import search_flight_availability
 from app.agents.tools.planner_tools import web_search
 from app.agents.tools.booker_tools import book_flight, book_hotel, search_hotels
-from langchain_core.agents.response_models import ToolStrategy
+from langchain.agents.structured_output import ToolStrategy
 
 from app.core.llm import llm 
 
@@ -16,7 +16,7 @@ requirments_agent = create_agent(
     model=llm,
     tools=[search_flight_availability],
     system_prompt=REQUIREMENTS_AGENT_SYSTEM_PROMPT,
-    response_model=ToolStrategy(RequirementsAgentResponseModel),
+    response_format=ToolStrategy(RequirementsAgentResponseModel),
 )
 
 planner_agent = create_agent(
@@ -36,7 +36,7 @@ booker_agent = create_agent(
 )
 
 if __name__ == "__main__":
-    for chunk in agent.stream(
+    for chunk in requirments_agent.stream(
         input={"message": ["I want to go to seoul(ICN) from Tokyo(NRT).My dates are flexible."]},
         stream_mode="updates",
     ):
